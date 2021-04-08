@@ -50,11 +50,11 @@ function loadLabeledImages() {
     return Promise.all(
         labels.map(async label => {
             const descriptions = []
-            for (let i = 1; i < 2; i++) {
+            for (let i = 0; i < 2; i++) {
                 const img = await faceapi.fetchImage(`https://raw.githubusercontent.com/elknhns/myits-profile-webxr/master/public/labeled_images/${label}/${i}.jpg`)
                 const detections = await faceapi.detectSingleFace(img).withFaceLandmarks().withFaceDescriptor()
                 descriptions.push(detections.descriptor)
-                // console.log('Add image')
+                console.log(`Added image ${i}.jpg`)
             }
             console.log(label + "'s face loaded")
             return new faceapi.LabeledFaceDescriptors(label, descriptions)
