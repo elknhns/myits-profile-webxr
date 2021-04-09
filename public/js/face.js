@@ -4,7 +4,7 @@ Promise.all([
     faceapi.nets.faceRecognitionNet.loadFromUri('/models'),
     faceapi.nets.faceLandmark68Net.loadFromUri('/models'),
     faceapi.nets.ssdMobilenetv1.loadFromUri('/models')
-]).then(startVideo)
+]).then(recognizeFaces)
 
 function startVideo() {
     navigator.getUserMedia(
@@ -12,17 +12,21 @@ function startVideo() {
         stream => video.srcObject = stream,
         err => console.error(err)
     )
-
-    recognizeFaces()
 }
 
 async function recognizeFaces() {
     const labeledDescriptors = await loadLabeledImages()
+    console.log('All labeled images loaded')
     const faceMatcher = new faceapi.FaceMatcher(labeledDescriptors, 0.6)
+    console.log('Face Matcher done')
+
+    startVideo()
     
     video.addEventListener('play', () => {
+        console.log('Video played')
         const canvas = faceapi.createCanvasFromMedia(video)
         document.body.append(canvas)
+        console.log('Canvas added')
         const displaySize = { width: video.width, height: video.height }
         faceapi.matchDimensions(canvas, displaySize)
         setInterval(async () => {
@@ -36,8 +40,8 @@ async function recognizeFaces() {
             // faceapi.draw.drawDetections(canvas, resizedDetections)
             // faceapi.draw.drawFaceLandmarks(canvas, resizedDetections)
             // faceapi.draw.drawFaceExpressions(canvas, resizedDetections)
-            results.forEach(result => {
-                const box = resizedDetections.detection.box
+            results.forEach((result, i) => {
+                const box = resizedDetections[i].detection.box
                 const drawBox = new faceapi.draw.DrawBox(box, { label: result.toString() })
                 drawBox.draw(canvas)
             })
@@ -46,7 +50,7 @@ async function recognizeFaces() {
 }
 
 function loadLabeledImages() {
-    const labels = ['Elkana Hans']
+    const labels = ['Elkana Hans', 'Paksi Ario', 'Raehan']
     return Promise.all(
         labels.map(async label => {
             const descriptions = []
