@@ -15,6 +15,7 @@ function startVideo() {
 }
 
 async function recognizeFaces() {
+    console.log('Face API Models loaded')
     const labeledDescriptors = await loadLabeledImages()
     console.log('All labeled images loaded')
     const faceMatcher = new faceapi.FaceMatcher(labeledDescriptors, 0.6)
@@ -23,10 +24,9 @@ async function recognizeFaces() {
     startVideo()
     
     video.addEventListener('play', () => {
-        console.log('Video played')
         const canvas = faceapi.createCanvasFromMedia(video)
         document.body.append(canvas)
-        console.log('Canvas added')
+        console.log('Added canvas')
         const displaySize = { width: video.width, height: video.height }
         faceapi.matchDimensions(canvas, displaySize)
         setInterval(async () => {
@@ -37,9 +37,7 @@ async function recognizeFaces() {
             const results = resizedDetections.map((d) => {
                 return faceMatcher.findBestMatch(d.descriptor)
             })
-            // faceapi.draw.drawDetections(canvas, resizedDetections)
-            // faceapi.draw.drawFaceLandmarks(canvas, resizedDetections)
-            // faceapi.draw.drawFaceExpressions(canvas, resizedDetections)
+            
             results.forEach((result, i) => {
                 const box = resizedDetections[i].detection.box
                 const drawBox = new faceapi.draw.DrawBox(box, { label: result.toString() })
@@ -50,7 +48,7 @@ async function recognizeFaces() {
 }
 
 function loadLabeledImages() {
-    const labels = ['Elkana Hans', 'Paksi Ario', 'Raehan']
+    const labels = ['Paksi Ario', 'Raehan']
     return Promise.all(
         labels.map(async label => {
             const descriptions = []
@@ -58,7 +56,7 @@ function loadLabeledImages() {
                 const img = await faceapi.fetchImage(`https://raw.githubusercontent.com/elknhns/myits-profile-webxr/master/public/labeled_images/${label}/${i}.jpg`)
                 const detections = await faceapi.detectSingleFace(img).withFaceLandmarks().withFaceDescriptor()
                 descriptions.push(detections.descriptor)
-                console.log(`Added image ${i}.jpg`)
+                // console.log(`Added image ${i}.jpg`)
             }
             console.log(label + "'s face loaded")
             return new faceapi.LabeledFaceDescriptors(label, descriptions)
