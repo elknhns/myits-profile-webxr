@@ -5,13 +5,15 @@ setButtonVisibility()
 
 function setButtonVisibility() {
     menu.addEventListener('zappar-visible', function () {
-        buttons.forEach(function (button) {
+        buttons.forEach((button) => {
             button.setAttribute('visible', 'true')
+            button.setAttribute('mixin', 'button animated')
         })
     })
     menu.addEventListener('zappar-notvisible', function () {
-        buttons.forEach(function (button) {
+        buttons.forEach((button) => {
             button.setAttribute('visible', 'false')
+            button.setAttribute('mixin', 'button')
         })
     })
 }

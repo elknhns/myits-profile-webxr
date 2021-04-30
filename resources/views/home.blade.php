@@ -3,10 +3,11 @@
 @section('content')
     @include('assets.index')
 
-    {{-- <a-video src="#video" width="16" height="9"></a-video> --}}
     <a-camera zappar-camera></a-camera>
     <a-entity id="menu" zappar-face>
         <a-entity zappar-head-mask="face:#menu"></a-entity>
+
+        <a-text id="labelText" value="" mixin="label font-bold"></a-text>
 
         <a-cylinder id="profile" class="button" mixin="button" position="-1.25 0.4 0">
             <a-image src="#user" mixin="icon"></a-image>
@@ -18,7 +19,7 @@
             <a-image src="#suitcase" mixin="icon"></a-image>
         </a-cylinder>
         <a-cylinder id="family" class="button" mixin="button" position="1.25 0.4 0">
-            <a-image src="#family" mixin="icon"></a-image>
+            <a-image src="#family" mixin="icon" scale="0.4 0.3 0.3"></a-image>
         </a-cylinder>
     </a-entity>
 @endsection

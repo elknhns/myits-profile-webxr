@@ -1,9 +1,7 @@
 <a-assets>
-    {{-- <video id="video" width="960" height="540" autoplay muted></video> --}}
-    <img src="{{ asset('img/user.png') }}" id="user">
-    <img src="{{ asset('img/graduation-hat.png') }}" id="graduation-hat">
-    <img src="{{ asset('img/suitcase.png') }}" id="suitcase">
-    <img src="{{ asset('img/family.png') }}" id="family">
+    @include('assets.mixins.image')
+
+    @include('assets.mixins.font')
 
     <a-mixin
         id="button"
@@ -14,9 +12,29 @@
     ></a-mixin>
 
     <a-mixin
+        id="animated"
+        animation="
+            property: position;
+            to: 0 0 0;
+            dir: reverse;
+            dur: 500;
+            easing: easeInCubic
+        "
+    ></a-mixin>
+
+    <a-mixin
         id="icon"
         rotation="90 0 0"
         position="0 -0.11 0"
         scale="0.3 0.3 0.3"
+    ></a-mixin>
+
+    <a-mixin
+        id="label"
+        position="0 1.2 0.3"
+        text="
+            align: center;
+            width: 2
+        "
     ></a-mixin>
 </a-assets>

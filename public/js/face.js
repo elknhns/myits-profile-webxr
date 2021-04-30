@@ -1,4 +1,6 @@
-const video = document.getElementById('video')
+const camera = document.querySelector('a-camera')
+const video = document.querySelector('#video')
+const label = document.querySelector('#labelText')
 
 Promise.all([
     faceapi.nets.faceRecognitionNet.loadFromUri('/models'),
@@ -22,33 +24,26 @@ async function recognizeFaces() {
     console.log('Face Matcher done')
 
     startVideo()
-    
-    video.addEventListener('play', () => {
-        const canvas = faceapi.createCanvasFromMedia(video)
-        document.body.append(canvas)
-        console.log('Added canvas')
-        const displaySize = { width: video.width, height: video.height }
-        faceapi.matchDimensions(canvas, displaySize)
+
+    video.addEventListener('play', function () {
         setInterval(async () => {
             const detections = await faceapi.detectAllFaces(video).withFaceLandmarks().withFaceDescriptors()
-            const resizedDetections = faceapi.resizeResults(detections, displaySize)
-            canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height)
-
-            const results = resizedDetections.map((d) => {
+            // console.log(video)
+    
+            const results = detections.map((d) => {
                 return faceMatcher.findBestMatch(d.descriptor)
             })
             
-            results.forEach((result, i) => {
-                const box = resizedDetections[i].detection.box
-                const drawBox = new faceapi.draw.DrawBox(box, { label: result.toString() })
-                drawBox.draw(canvas)
+            results.forEach((result) => {
+                // console.log(result.label)
+                label.setAttribute('value', result.label)
             })
         }, 100)
     })
 }
 
 function loadLabeledImages() {
-    const labels = ['Paksi Ario', 'Raehan']
+    const labels = ['05111740000076', '05111740000127', '05111740000154']
     return Promise.all(
         labels.map(async label => {
             const descriptions = []
