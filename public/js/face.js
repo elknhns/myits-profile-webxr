@@ -1,6 +1,8 @@
 const camera = document.querySelector('a-camera')
 const video = document.querySelector('#video')
-const label = document.querySelector('#labelText')
+const nrp = document.querySelector('#nrp')
+
+const profile = document.querySelector('#profile')
 
 Promise.all([
     faceapi.nets.faceRecognitionNet.loadFromUri('/models'),
@@ -26,6 +28,7 @@ async function recognizeFaces() {
     startVideo()
 
     video.addEventListener('play', function () {
+        var currentLabel = ""
         setInterval(async () => {
             const detections = await faceapi.detectAllFaces(video).withFaceLandmarks().withFaceDescriptors()
             // console.log(video)
@@ -36,9 +39,29 @@ async function recognizeFaces() {
             
             results.forEach((result) => {
                 // console.log(result.label)
-                label.setAttribute('value', result.label)
+                if (result.label != currentLabel) {
+                    if (result.label != 'unknown') {
+                        $.ajaxSetup({
+                            headers: {
+                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                            }
+                        })
+                        $.ajax({
+                            type: 'POST',
+                            url: `search/${result.label}`,
+                            success: function (response) {
+                                console.log(response)
+                                nrp.setAttribute('value', response.nrp)
+                            },
+                            error: function (error) {
+                                console.log(error)
+                            }
+                        })
+                        currentLabel = result.label
+                    }   
+                }
             })
-        }, 100)
+        }, 1000)
     })
 }
 

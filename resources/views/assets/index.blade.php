@@ -4,11 +4,15 @@
     @include('assets.mixins.font')
 
     <a-mixin
+        id="menuSection"
+        visible="false"
+    ></a-mixin>
+    
+    <a-mixin
         id="button"
         material="color: #053b82"
         rotation="-90 0 0"
         geometry="radius: 0.3; height: 0.2"
-        visible="false"
     ></a-mixin>
 
     <a-mixin
