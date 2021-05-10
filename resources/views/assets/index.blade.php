@@ -4,7 +4,7 @@
     @include('assets.mixins.font')
 
     <a-mixin
-        id="menuSection"
+        id="menu-section"
         visible="false"
     ></a-mixin>
     
@@ -13,6 +13,36 @@
         material="color: #053b82"
         rotation="-90 0 0"
         geometry="radius: 0.3; height: 0.2"
+    ></a-mixin>
+
+    <a-mixin
+        id="details"
+        geometry="depth: 0.1"
+    ></a-mixin>
+
+    <a-mixin
+        id="detail-title"
+        material="color: #053b82"
+        geometry="depth: 0.12"
+    ></a-mixin>
+
+    <a-mixin
+        id="detail-title-text"
+        text="
+            anchor: center;
+            width: 2;
+            align: center;
+            baseline: top;
+        "
+    ></a-mixin>
+
+    <a-mixin
+        id="detail-text"
+        text="
+            color: black;
+            width: 1.3;
+            anchor: left;
+        "
     ></a-mixin>
 
     <a-mixin
@@ -35,7 +65,6 @@
 
     <a-mixin
         id="label"
-        position="0 1.2 0.3"
         text="
             align: center;
             width: 2

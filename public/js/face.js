@@ -1,8 +1,9 @@
 const camera = document.querySelector('a-camera')
 const video = document.querySelector('#video')
-const nrp = document.querySelector('#nrp')
+const label = document.querySelector('#labelSection')
 
 const profile = document.querySelector('#profile')
+const details = profile.lastElementChild
 
 Promise.all([
     faceapi.nets.faceRecognitionNet.loadFromUri('/models'),
@@ -20,9 +21,11 @@ function startVideo() {
 
 async function recognizeFaces() {
     console.log('Face API Models loaded')
+
     const labeledDescriptors = await loadLabeledImages()
     console.log('All labeled images loaded')
-    const faceMatcher = new faceapi.FaceMatcher(labeledDescriptors, 0.6)
+    
+    const faceMatcher = prepareFaceMatcher(labeledDescriptors)
     console.log('Face Matcher done')
 
     startVideo()
@@ -30,15 +33,14 @@ async function recognizeFaces() {
     video.addEventListener('play', function () {
         var currentLabel = ""
         setInterval(async () => {
-            const detections = await faceapi.detectAllFaces(video).withFaceLandmarks().withFaceDescriptors()
-            // console.log(video)
-    
+            const detections = await faceapi.detectAllFaces(video).withFaceLandmarks().withFaceDescriptors()    
             const results = detections.map((d) => {
                 return faceMatcher.findBestMatch(d.descriptor)
             })
             
-            results.forEach((result) => {
-                // console.log(result.label)
+            if (results.length !== 0) {
+                const result = results[0]
+
                 if (result.label != currentLabel) {
                     if (result.label != 'unknown') {
                         $.ajaxSetup({
@@ -50,8 +52,8 @@ async function recognizeFaces() {
                             type: 'POST',
                             url: `search/${result.label}`,
                             success: function (response) {
-                                console.log(response)
-                                nrp.setAttribute('value', response.nrp)
+                                updateLabel(response)
+                                updateDetails(response)
                             },
                             error: function (error) {
                                 console.log(error)
@@ -60,13 +62,17 @@ async function recognizeFaces() {
                         currentLabel = result.label
                     }   
                 }
-            })
+            }
         }, 1000)
     })
 }
 
+function prepareFaceMatcher(labeledDescriptors) {
+    return new faceapi.FaceMatcher(labeledDescriptors, 0.6)
+}
+
 function loadLabeledImages() {
-    const labels = ['05111740000076', '05111740000127', '05111740000154']
+    const labels = ['05111740000049', '05111740000076', '05111740000127', '05111740000154']
     return Promise.all(
         labels.map(async label => {
             const descriptions = []
@@ -80,4 +86,47 @@ function loadLabeledImages() {
             return new faceapi.LabeledFaceDescriptors(label, descriptions)
         })
     )
+}
+
+function updateLabel(info) {
+    label.children[0].setAttribute('value', info.nama)
+    label.children[1].setAttribute('value', info.nrp)
+}
+
+function updateDetails(info) {
+    details.children[1].children[2].setAttribute('value', capitalize(info.nama_lengkap))
+    details.children[2].children[2].setAttribute('value', filterGender(info.jenis_kelamin))
+    details.children[3].children[2].setAttribute('value', `${filterBirthPlace(info.tempat_lahir)}, ${filterBirthday(info.tanggal_lahir)}`)
+    details.children[4].children[2].setAttribute('value', info.agama)
+    details.children[5].children[2].setAttribute('value', info.no_telp)
+    details.children[6].children[2].setAttribute('value', info.email)
+    details.children[7].children[2].setAttribute('value', info.golongan_darah)
+    details.children[8].children[2].setAttribute('value', info.alamat_surabaya)
+}
+
+function capitalize(sentence) {
+    sentence = sentence.split(' ')
+    for (let i = 0; i < sentence.length; i++) {
+        sentence[i] = sentence[i].charAt(0).toUpperCase() + sentence[i].slice(1).toLowerCase()
+    }
+    return sentence.toString().replace(/,/g, " ")
+}
+
+function filterGender(gender) {
+    return gender === 'L' ? 'Laki-laki' : 'Perempuan'
+}
+
+function filterBirthPlace(birthplace) {
+    let commaPos = birthplace.indexOf(',')
+    return (commaPos < 0) ? capitalize(birthplace) : capitalize(birthplace.slice(0, commaPos))
+}
+
+function filterBirthday(birthday) {
+    // birthday = [yyyy, mm, dd]
+    birthday = birthday.split('-')
+
+    let months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember']
+
+    // return d m Y
+    return `${birthday[2]} ${months[parseInt(birthday[1]) - 1]} ${birthday[0]}`
 }

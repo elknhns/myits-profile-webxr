@@ -1,34 +1,34 @@
 var menu = document.querySelector("#menu")
-var buttons = document.querySelectorAll(".button")
+var buttons = document.querySelectorAll(".menu-button")
 
 setButtonVisibility()
 
-AFRAME.registerComponent('profile', {
-    schema: {
-        name: {},
-        nrp: {},
-        doswal: {}
-    },
-
-    init: function () {
-        // Do something when component first attached.
-    },
-});
-
+document.addEventListener('keydown', function (event) {
+    let details = profile.children[1]
+    if (event.key === 'q') {
+        if (details.getAttribute('visible')) {
+            details.setAttribute('visible', 'false')
+            details.previousElementSibling.setAttribute('visible', 'true')
+        } else {
+            details.setAttribute('visible', 'true')
+            details.previousElementSibling.setAttribute('visible', 'false')
+        }
+    }
+})
 
 function setButtonVisibility() {
     menu.addEventListener('zappar-visible', function () {
         buttons.forEach((button) => {
-            button.parentNode.setAttribute('visible', 'true')
-            button.setAttribute('mixin', 'button animated')
-            nrp.setAttribute('visible', 'true')
+            button.setAttribute('visible', 'true')
+            button.setAttribute('mixin', 'menu-section animated')
+            label.setAttribute('visible', 'true')
         })
     })
     menu.addEventListener('zappar-notvisible', function () {
         buttons.forEach((button) => {
-            button.parentNode.setAttribute('visible', 'false')
-            button.setAttribute('mixin', 'button')
-            nrp.setAttribute('visible', 'false')
+            button.setAttribute('visible', 'false')
+            button.setAttribute('mixin', 'menu-section')
+            label.setAttribute('visible', 'false')
         })
     })
 }
