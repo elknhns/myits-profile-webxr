@@ -2,8 +2,8 @@ const camera = document.querySelector('a-camera')
 const video = document.querySelector('#video')
 const label = document.querySelector('#labelSection')
 
-const profile = document.querySelector('#profile')
-const details = profile.lastElementChild
+const biodata = document.querySelector('#biodata')
+const details = biodata.lastElementChild
 
 Promise.all([
     faceapi.nets.faceRecognitionNet.loadFromUri('/models'),
@@ -77,7 +77,7 @@ function loadLabeledImages() {
         labels.map(async label => {
             const descriptions = []
             for (let i = 0; i < 2; i++) {
-                const img = await faceapi.fetchImage(`https://raw.githubusercontent.com/elknhns/myits-profile-webxr/master/public/labeled_images/${label}/${i}.jpg`)
+                const img = await faceapi.fetchImage(`https://raw.githubusercontent.com/elknhns/myits-profile-webxr-photos/main/labeled_images/${label}/${i}.jpg`)
                 const detections = await faceapi.detectSingleFace(img).withFaceLandmarks().withFaceDescriptor()
                 descriptions.push(detections.descriptor)
                 // console.log(`Added image ${i}.jpg`)
