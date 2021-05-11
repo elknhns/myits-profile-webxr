@@ -3,7 +3,6 @@ const video = document.querySelector('#video')
 const label = document.querySelector('#labelSection')
 
 const biodata = document.querySelector('#biodata')
-const details = biodata.lastElementChild
 
 Promise.all([
     faceapi.nets.faceRecognitionNet.loadFromUri('/models'),
@@ -94,14 +93,17 @@ function updateLabel(info) {
 }
 
 function updateDetails(info) {
-    details.children[1].children[2].setAttribute('value', capitalize(info.nama_lengkap))
-    details.children[2].children[2].setAttribute('value', filterGender(info.jenis_kelamin))
-    details.children[3].children[2].setAttribute('value', `${filterBirthPlace(info.tempat_lahir)}, ${filterBirthday(info.tanggal_lahir)}`)
-    details.children[4].children[2].setAttribute('value', info.agama)
-    details.children[5].children[2].setAttribute('value', info.no_telp)
-    details.children[6].children[2].setAttribute('value', info.email)
-    details.children[7].children[2].setAttribute('value', info.golongan_darah)
-    details.children[8].children[2].setAttribute('value', info.alamat_surabaya)
+    const details = biodata.lastElementChild
+    const detailText = details.lastElementChild
+    
+    detailText.children[0].lastElementChild.setAttribute('value', capitalize(info.nama_lengkap))
+    detailText.children[1].lastElementChild.setAttribute('value', info.email)
+    detailText.children[2].lastElementChild.setAttribute('value', info.no_telp)
+    detailText.children[3].lastElementChild.setAttribute('value', filterGender(info.jenis_kelamin))
+    detailText.children[4].lastElementChild.setAttribute('value', info.agama)
+    detailText.children[5].lastElementChild.setAttribute('value', info.golongan_darah)
+    detailText.children[6].lastElementChild.setAttribute('value', `${filterBirthPlace(info.tempat_lahir)}, ${filterBirthday(info.tanggal_lahir)}`)
+    detailText.children[7].lastElementChild.setAttribute('value', info.alamat_surabaya)
 }
 
 function capitalize(sentence) {
@@ -128,5 +130,5 @@ function filterBirthday(birthday) {
     let months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember']
 
     // return d m Y
-    return `${birthday[2]} ${months[parseInt(birthday[1]) - 1]} ${birthday[0]}`
+    return `${parseInt(birthday[2])} ${months[parseInt(birthday[1]) - 1]} ${birthday[0]}`
 }

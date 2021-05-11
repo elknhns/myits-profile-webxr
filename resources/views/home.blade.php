@@ -13,23 +13,8 @@
         </a-entity>
 
         @include('menus.biodata')
-
-        <a-entity id="academic" class="menu-button" mixin="menu-section" position="-0.75 1.5 0">
-            <a-cylinder mixin="button">
-                <a-image src="#graduation-hat" mixin="icon" scale="0.4 0.4 0.4"></a-image>
-            </a-cylinder>
-        </a-entity>
-        
-        <a-entity id="occupation" class="menu-button" mixin="menu-section" position="0.75 1.5 0">
-            <a-cylinder mixin="button">
-                <a-image src="#suitcase" mixin="icon"></a-image>
-            </a-cylinder>
-        </a-entity>
-
-        <a-entity id="family" class="menu-button" mixin="menu-section" position="1.25 0.4 0">
-            <a-cylinder mixin="button">
-                <a-image src="#family" mixin="icon" scale="0.4 0.3 0.3"></a-image>
-            </a-cylinder>
-        </a-entity>
+        @include('menus.academics')
+        @include('menus.occupation')
+        @include('menus.family')
     </a-entity>
 @endsection

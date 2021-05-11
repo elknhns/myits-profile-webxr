@@ -3,6 +3,8 @@
 
     @include('assets.mixins.font')
 
+    @include('assets.mixins.align')
+
     <a-mixin
         id="menu-section"
         visible="false"
@@ -16,14 +18,9 @@
     ></a-mixin>
 
     <a-mixin
-        id="details"
-        geometry="depth: 0.1"
-    ></a-mixin>
-
-    <a-mixin
         id="detail-title"
         material="color: #053b82"
-        geometry="depth: 0.12"
+        geometry="depth: 0.02"
     ></a-mixin>
 
     <a-mixin
@@ -39,9 +36,17 @@
     <a-mixin
         id="detail-text"
         text="
-            color: black;
+            color: #053b82;
             width: 1.3;
             anchor: left;
+        "
+    ></a-mixin>
+
+    <a-mixin
+        id="query"
+        text="
+            color: black;
+            width: 1.5;
         "
     ></a-mixin>
 

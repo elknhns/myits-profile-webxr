@@ -4,11 +4,9 @@ var buttons = document.querySelectorAll(".menu-button")
 setButtonVisibility()
 
 document.addEventListener('keydown', function (event) {
-    let details = biodata.children[1]
-
     // Use 'Q' to toggle biodata details
     if (event.key === 'q') {
-        toggleDetailVisibility(details)
+        toggleDetailVisibility(biodata)
     }
 })
 
@@ -18,7 +16,7 @@ function setButtonVisibility() {
             button.setAttribute('visible', 'true')
             button.setAttribute('mixin', 'menu-section animated')
             label.setAttribute('visible', 'true')
-            toggleDetailVisibility(details, true)
+            toggleDetailVisibility(biodata, true)
         })
     })
     menu.addEventListener('zappar-notvisible', function () {
@@ -30,7 +28,9 @@ function setButtonVisibility() {
     })
 }
 
-function toggleDetailVisibility(details, makeInvisible = false) {
+function toggleDetailVisibility(menu, makeInvisible = false) {
+    const details = menu.lastElementChild
+    
     if (details.getAttribute('visible') || makeInvisible) {
         details.setAttribute('visible', 'false')
         details.previousElementSibling.setAttribute('visible', 'true')
