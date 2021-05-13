@@ -18,9 +18,19 @@
     ></a-mixin>
 
     <a-mixin
+        id="detail-card"
+        geometry="width: 1.7"
+        material="opacity: 0.75"
+    ></a-mixin>
+
+    <a-mixin
         id="detail-title"
         material="color: #053b82"
-        geometry="depth: 0.02"
+        geometry="
+            depth: 0.02;
+            height: 0.33;
+            width: 1.72;
+        "
     ></a-mixin>
 
     <a-mixin

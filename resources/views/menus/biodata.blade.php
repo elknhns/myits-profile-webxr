@@ -2,8 +2,8 @@
     <a-cylinder mixin="button">
         <a-image src="#user" mixin="icon"></a-image>
     </a-cylinder>
-    <a-plane height="1.8" width="1.7" position="-0.3 -0.2 0.2" visible="false">
-        <a-box id="detailTitle" mixin="detail-title" height="0.33" width="1.72" position="0 0.75 0">
+    <a-plane mixin="detail-card" position="-0.3 -0.2 0.2" height="1.9" visible="false">
+        <a-box id="detailTitle" mixin="detail-title" position="0 0.8 0">
             <a-text mixin="raleway-bold detail-title-text" value="BIODATA" position="0 -0.04 0.06"></a-text>
         </a-box>
         <a-entity id="detailText">
@@ -32,7 +32,7 @@
                 <a-text mixin="roboto-regular detail-text query" position="0 -0.1 0" value="Wajah tidak dikenal"></a-text>
             </a-entity>
             <a-entity position="0 -0.35 0.051" id="birthday">
-                <a-text mixin="roboto-bold detail-text align-center" position="0 0 0" value="TTL"></a-text>
+                <a-text mixin="roboto-bold detail-text align-center" position="0 0 0" value="TEMPAT DAN TANGGAL LAHIR"></a-text>
                 <a-text mixin="roboto-regular detail-text query align-center" position="0 -0.1 0" value="Wajah tidak dikenal"></a-text>
             </a-entity>
             <a-entity position="0 -0.6 0.051" id="address">

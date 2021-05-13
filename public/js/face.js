@@ -3,6 +3,9 @@ const video = document.querySelector('#video')
 const label = document.querySelector('#labelSection')
 
 const biodata = document.querySelector('#biodata')
+const academics = document.querySelector('#academics')
+
+var currentLabel = ""
 
 Promise.all([
     faceapi.nets.faceRecognitionNet.loadFromUri('/models'),
@@ -30,12 +33,12 @@ async function recognizeFaces() {
     startVideo()
 
     video.addEventListener('play', function () {
-        var currentLabel = ""
         setInterval(async () => {
             const detections = await faceapi.detectAllFaces(video).withFaceLandmarks().withFaceDescriptors()    
             const results = detections.map((d) => {
                 return faceMatcher.findBestMatch(d.descriptor)
             })
+            console.log(currentLabel)
             
             if (results.length !== 0) {
                 const result = results[0]
@@ -52,7 +55,8 @@ async function recognizeFaces() {
                             url: `search/${result.label}`,
                             success: function (response) {
                                 updateLabel(response)
-                                updateDetails(response)
+                                updateBiodata(response)
+                                updateAcademics(response)
                             },
                             error: function (error) {
                                 console.log(error)
@@ -61,6 +65,8 @@ async function recognizeFaces() {
                         currentLabel = result.label
                     }   
                 }
+            } else {
+                currentLabel = ""
             }
         }, 1000)
     })
@@ -92,7 +98,7 @@ function updateLabel(info) {
     label.children[1].setAttribute('value', info.nrp)
 }
 
-function updateDetails(info) {
+function updateBiodata(info) {
     const details = biodata.lastElementChild
     const detailText = details.lastElementChild
     
@@ -103,7 +109,20 @@ function updateDetails(info) {
     detailText.children[4].lastElementChild.setAttribute('value', info.agama)
     detailText.children[5].lastElementChild.setAttribute('value', info.golongan_darah)
     detailText.children[6].lastElementChild.setAttribute('value', `${filterBirthPlace(info.tempat_lahir)}, ${filterBirthday(info.tanggal_lahir)}`)
-    detailText.children[7].lastElementChild.setAttribute('value', info.alamat_surabaya)
+    detailText.children[7].lastElementChild.setAttribute('value', `${info.alamat_surabaya}, ${info.kode_pos}`)
+}
+
+function updateAcademics(info) {
+    const details = academics.lastElementChild
+    const detailText = details.lastElementChild
+    
+    detailText.children[0].lastElementChild.setAttribute('value', info.nrp)
+    detailText.children[1].lastElementChild.setAttribute('value', capitalize(info.prodi))
+    detailText.children[2].lastElementChild.setAttribute('value', fliterGPA(info.ipk))
+    detailText.children[3].lastElementChild.setAttribute('value', info.tahun_masuk)
+    detailText.children[4].lastElementChild.setAttribute('value', info.sks_lulus)
+    detailText.children[5].lastElementChild.setAttribute('value', info.semester_ke)
+    detailText.children[6].lastElementChild.setAttribute('value', info.dosen_wali)
 }
 
 function capitalize(sentence) {
@@ -131,4 +150,9 @@ function filterBirthday(birthday) {
 
     // return d m Y
     return `${parseInt(birthday[2])} ${months[parseInt(birthday[1]) - 1]} ${birthday[0]}`
+}
+
+function fliterGPA(gpa) {
+    // Round GPA to 2 digit decimal
+    return parseFloat(gpa).toFixed(2)
 }

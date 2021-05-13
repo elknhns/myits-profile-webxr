@@ -7,6 +7,13 @@ document.addEventListener('keydown', function (event) {
     // Use 'Q' to toggle biodata details
     if (event.key === 'q') {
         toggleDetailVisibility(biodata)
+        toggleDetailVisibility(academics, true)
+    }
+
+    // Use 'W' to toggle academics details
+    if (event.key === 'w') {
+        toggleDetailVisibility(academics)
+        toggleDetailVisibility(biodata, true)
     }
 })
 
@@ -17,6 +24,7 @@ function setButtonVisibility() {
             button.setAttribute('mixin', 'menu-section animated')
             label.setAttribute('visible', 'true')
             toggleDetailVisibility(biodata, true)
+            toggleDetailVisibility(academics, true)
         })
     })
     menu.addEventListener('zappar-notvisible', function () {
@@ -24,6 +32,7 @@ function setButtonVisibility() {
             button.setAttribute('visible', 'false')
             button.setAttribute('mixin', 'menu-section')
             label.setAttribute('visible', 'false')
+            currentLabel = ""
         })
     })
 }
