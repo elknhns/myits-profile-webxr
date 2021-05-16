@@ -5,6 +5,8 @@
 
     @include('assets.mixins.align')
 
+    @include('assets.mixins.animation')
+
     <a-mixin
         id="menu-section"
         visible="false"
@@ -20,7 +22,7 @@
     <a-mixin
         id="detail-card"
         geometry="width: 1.7"
-        material="opacity: 0.75"
+        material="opacity: 0"
     ></a-mixin>
 
     <a-mixin
@@ -57,17 +59,6 @@
         text="
             color: black;
             width: 1.5;
-        "
-    ></a-mixin>
-
-    <a-mixin
-        id="animated"
-        animation="
-            property: position;
-            to: 0 0 0;
-            dir: reverse;
-            dur: 500;
-            easing: easeInCubic
         "
     ></a-mixin>
 

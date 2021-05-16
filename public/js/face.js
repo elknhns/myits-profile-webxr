@@ -38,7 +38,7 @@ async function recognizeFaces() {
             const results = detections.map((d) => {
                 return faceMatcher.findBestMatch(d.descriptor)
             })
-            console.log(currentLabel)
+            // console.log(currentLabel)
             
             if (results.length !== 0) {
                 const result = results[0]

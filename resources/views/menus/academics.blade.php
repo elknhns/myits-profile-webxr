@@ -2,7 +2,7 @@
     <a-cylinder mixin="button">
         <a-image src="#graduation-hat" mixin="icon" scale="0.4 0.4 0.4"></a-image>
     </a-cylinder>
-    <a-plane mixin="detail-card" position="0 0.2 0.2" height="1.4" visible="false">
+    <a-plane mixin="detail-card" position="0 0.2 0.3" height="1.4" visible="false">
         <a-box id="detailTitle" mixin="detail-title" position="0 0.75 0">
             <a-text mixin="raleway-bold detail-title-text" value="AKADEMIK" position="0 -0.04 0.06"></a-text>
         </a-box>
