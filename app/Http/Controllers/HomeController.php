@@ -13,6 +13,28 @@ class HomeController extends Controller
         return view('home');
     }
 
+    public function requestAllNRP()
+    {
+        $accessToken = $this->getAccessToken();
+
+        $response = Http::withToken($accessToken)->get('https://api.its.ac.id:8443/akademik-sandbox/1.5/mahasiswa/list-nrp');
+        $labels = [];
+        foreach ($response->json() as $item) {
+            array_push($labels, $item['nrp_baru']);
+        }
+
+        return $labels;
+    }
+
+    public function requestPhoto($nrp)
+    {
+        $accessToken = $this->getAccessToken();
+
+        $response = Http::withToken($accessToken)->get('https://api.its.ac.id:8443/akademik-sandbox/1.5/mahasiswa/' . $nrp . '/foto');
+
+        return $response;
+    }
+
     public function recognizeFace($nrp)
     {
         $accessToken = $this->getAccessToken();

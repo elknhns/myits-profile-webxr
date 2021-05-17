@@ -78,6 +78,8 @@ function prepareFaceMatcher(labeledDescriptors) {
 
 function loadLabeledImages() {
     const labels = ['05111740000049', '05111740000076', '05111740000127', '05111740000154']
+    // const labels = requestAllNRP()
+
     return Promise.all(
         labels.map(async label => {
             const descriptions = []
@@ -87,10 +89,51 @@ function loadLabeledImages() {
                 descriptions.push(detections.descriptor)
                 // console.log(`Added image ${i}.jpg`)
             }
+            // const img = requestPhoto(label)
+            // const detections = await faceapi.detectSingleFace(img).withFaceLandmarks().withFaceDescriptor()
+            // descriptions.push(detections.descriptor)
+            // // console.log(`Added image ${i}.jpg`)
+
             console.log(label + "'s face loaded")
             return new faceapi.LabeledFaceDescriptors(label, descriptions)
         })
     )
+}
+
+function requestAllNRP() {
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        }
+    })
+    $.ajax({
+        type: 'POST',
+        url: `nrp`,
+        success: function (response) {
+            return response
+        },
+        error: function (error) {
+            console.log(error)
+        }
+    })
+}
+
+function requestPhoto(nrp) {
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        }
+    })
+    $.ajax({
+        type: 'POST',
+        url: `search/${nrp}/photo`,
+        success: function (response) {
+            return response
+        },
+        error: function (error) {
+            console.log(error)
+        }
+    })
 }
 
 function updateLabel(info) {

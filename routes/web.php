@@ -15,4 +15,6 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', [HomeController::class, 'index']);
+Route::post('nrp', [HomeController::class, 'requestAllNRP']);
+Route::post('search/{nrp}/photo', [HomeController::class, 'requestPhoto']);
 Route::post('search/{nrp}', [HomeController::class, 'recognizeFace']);
