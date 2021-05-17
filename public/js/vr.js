@@ -47,10 +47,12 @@ function toggleDetailVisibility(menu, toggleOff = false) {
         details.setAttribute('mixin', 'detail-card')
         details.previousElementSibling.setAttribute('mixin', 'button pop-in')
         titleBox.setAttribute('mixin', 'detail-title')
+        titleBox.firstElementChild.setAttribute('mixin', 'raleway-bold detail-title-text')
     } else {
         details.setAttribute('visible', 'true')
         details.setAttribute('mixin', 'detail-card opened')
         details.previousElementSibling.setAttribute('mixin', 'button shrink')
         titleBox.setAttribute('mixin', 'detail-title unfolded')
+        titleBox.firstElementChild.setAttribute('mixin', 'raleway-bold detail-title-text fade-in')
     }
 }

@@ -22,7 +22,7 @@
     <a-mixin
         id="detail-card"
         geometry="width: 1.7"
-        material="opacity: 0"
+        material="opacity: 0.75"
     ></a-mixin>
 
     <a-mixin
@@ -42,6 +42,7 @@
             width: 2;
             align: center;
             baseline: top;
+            opacity: 0;
         "
     ></a-mixin>
 
