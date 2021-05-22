@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Storage;
 
 class HomeController extends Controller
 {   
@@ -28,11 +29,17 @@ class HomeController extends Controller
 
     public function requestPhoto($nrp)
     {
-        $accessToken = $this->getAccessToken();
-
-        $response = Http::withToken($accessToken)->get('https://api.its.ac.id:8443/akademik-sandbox/1.5/mahasiswa/' . $nrp . '/foto');
-
-        return $response;
+        if (Storage::disk('local')->missing($nrp.'.jpg')) {
+            $accessToken = $this->getAccessToken();
+            $response = Http::withToken($accessToken)
+                            ->get('https://api.its.ac.id:8443/akademik-sandbox/1.5/mahasiswa/'.$nrp.'/foto');
+            if ($response->getStatusCode() == 200) {
+                Storage::put('public/'.$nrp.'.jpg', $response);
+                return asset('storage/'.$nrp.'.jpg');
+            } else {
+                return null;
+            }
+        }
     }
 
     public function recognizeFace($nrp)
