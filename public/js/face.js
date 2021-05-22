@@ -14,11 +14,9 @@ Promise.all([
 ]).then(recognizeFaces)
 
 function startVideo() {
-    navigator.mediaDevices.getUserMedia(
-        { video: {} },
-        stream => video.srcObject = stream,
-        err => console.error(err)
-    )
+    navigator.mediaDevices.getUserMedia({ video: {} })
+        .then(stream => video.srcObject = stream)
+        .catch(err => console.error(err))
 }
 
 async function recognizeFaces() {
@@ -38,7 +36,7 @@ async function recognizeFaces() {
             const results = detections.map((d) => {
                 return faceMatcher.findBestMatch(d.descriptor)
             })
-            // console.log(currentLabel)
+            console.log(results)
             
             if (results.length !== 0) {
                 const result = results[0]
@@ -76,21 +74,54 @@ function prepareFaceMatcher(labeledDescriptors) {
     return new faceapi.FaceMatcher(labeledDescriptors, 0.6)
 }
 
-function loadLabeledImages() {
+async function loadLabeledImages() {
     const labels = ['05111740000049', '05111740000076', '05111740000127', '05111740000154']
+    // const labels = await requestAllNRP()
+    console.log(labels)
+
     return Promise.all(
         labels.map(async label => {
             const descriptions = []
-            for (let i = 0; i < 2; i++) {
-                const img = await faceapi.fetchImage(`https://raw.githubusercontent.com/elknhns/myits-profile-webxr-photos/main/labeled_images/${label}/${i}.jpg`)
+            const link = await requestPhoto(label)
+            console.log(link)
+            if (!link) {
+                console.log(label + "'s photo not found")
+            } else {
+                const img = await faceapi.fetchImage(link)
+                console.log(img)
                 const detections = await faceapi.detectSingleFace(img).withFaceLandmarks().withFaceDescriptor()
                 descriptions.push(detections.descriptor)
                 // console.log(`Added image ${i}.jpg`)
+
+                console.log(label + "'s face loaded")
             }
-            console.log(label + "'s face loaded")
             return new faceapi.LabeledFaceDescriptors(label, descriptions)
         })
     )
+}
+
+function requestAllNRP() {
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        }
+    })
+    return $.ajax({
+        type: 'POST',
+        url: `nrp`,
+    })
+}
+
+function requestPhoto(nrp) {
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        }
+    })
+    return $.ajax({
+        type: 'POST',
+        url: `search/${nrp}/photo`,
+    })
 }
 
 function updateLabel(info) {
