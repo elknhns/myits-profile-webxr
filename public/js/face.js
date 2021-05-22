@@ -14,7 +14,7 @@ Promise.all([
 ]).then(recognizeFaces)
 
 function startVideo() {
-    navigator.getUserMedia(
+    navigator.mediaDevices.getUserMedia(
         { video: {} },
         stream => video.srcObject = stream,
         err => console.error(err)
