@@ -22,8 +22,10 @@ function startVideo() {
 async function recognizeFaces() {
     console.log('Face API Models loaded')
 
-    const labeledDescriptors = await loadLabeledImages()
+    var labeledDescriptors = await loadLabeledImages()
     console.log('All labeled images loaded')
+
+    labeledDescriptors = cleanDescriptors(labeledDescriptors)
     
     const faceMatcher = prepareFaceMatcher(labeledDescriptors)
     console.log('Face Matcher done')
@@ -36,7 +38,7 @@ async function recognizeFaces() {
             const results = detections.map((d) => {
                 return faceMatcher.findBestMatch(d.descriptor)
             })
-            console.log(results)
+            // console.log(results)
             
             if (results.length !== 0) {
                 const result = results[0]
@@ -91,7 +93,6 @@ async function loadLabeledImages() {
                 console.log(img)
                 const detections = await faceapi.detectSingleFace(img).withFaceLandmarks().withFaceDescriptor()
                 descriptions.push(detections.descriptor)
-                // console.log(`Added image ${i}.jpg`)
 
                 console.log(label + "'s face loaded")
             }
@@ -122,6 +123,15 @@ function requestPhoto(nrp) {
         type: 'POST',
         url: `search/${nrp}/photo`,
     })
+}
+
+function cleanDescriptors(descriptors) {
+    descriptors.forEach((face, index, descriptor) => {
+        if (face.descriptors.length === 0) {
+            descriptor.splice(index, 1)
+        }
+    })
+    return descriptors
 }
 
 function updateLabel(info) {
