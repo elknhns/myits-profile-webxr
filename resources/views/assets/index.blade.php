@@ -73,8 +73,23 @@
     <a-mixin
         id="label"
         text="
-            align: center;
+            align: left;
             width: 2
         "
+    ></a-mixin>
+
+    <a-mixin
+        id="label-name"
+        text="
+            baseline: top;
+            width: 1.2;
+            wrapCount: 21
+        "
+    ></a-mixin>
+
+    <a-mixin
+        id="label-photo"
+        position="-0.5 0 0"
+        scale="0.45 0.5 1"
     ></a-mixin>
 </a-assets>

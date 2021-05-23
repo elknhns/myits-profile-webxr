@@ -11,7 +11,7 @@ Promise.all([
     faceapi.nets.faceRecognitionNet.loadFromUri('/models'),
     faceapi.nets.faceLandmark68Net.loadFromUri('/models'),
     faceapi.nets.ssdMobilenetv1.loadFromUri('/models')
-]).then(recognizeFaces)
+]).then(learnFaces)
 
 function startVideo() {
     navigator.mediaDevices.getUserMedia({ video: {} })
@@ -19,7 +19,7 @@ function startVideo() {
         .catch(err => console.error(err))
 }
 
-async function recognizeFaces() {
+async function learnFaces() {
     console.log('Face API Models loaded')
 
     var labeledDescriptors = await loadLabeledImages()
@@ -31,8 +31,11 @@ async function recognizeFaces() {
     console.log('Face Matcher done')
 
     startVideo()
+    recognizeFaces(faceMatcher)
+}
 
-    video.addEventListener('play', function () {
+async function recognizeFaces(faceMatcher) {
+    video.addEventListener('play', () => {
         setInterval(async () => {
             const detections = await faceapi.detectAllFaces(video).withFaceLandmarks().withFaceDescriptors()    
             const results = detections.map((d) => {
@@ -53,13 +56,13 @@ async function recognizeFaces() {
                         $.ajax({
                             type: 'POST',
                             url: `search/${result.label}`,
-                            success: function (response) {
+                            success: response => {
                                 updateLabel(response)
                                 updateBiodata(response)
                                 updateAcademics(response)
                             },
-                            error: function (error) {
-                                console.log(error)
+                            error: err => {
+                                console.log(err)
                             }
                         })
                         currentLabel = result.label
@@ -89,6 +92,8 @@ async function loadLabeledImages() {
             if (!link) {
                 console.log(label + "'s photo not found")
             } else {
+                registerPhoto(label, link)
+                
                 const img = await faceapi.fetchImage(link)
                 console.log(img)
                 const detections = await faceapi.detectSingleFace(img).withFaceLandmarks().withFaceDescriptor()
@@ -125,6 +130,14 @@ function requestPhoto(nrp) {
     })
 }
 
+function registerPhoto(nrp, src) {
+    const assets = document.querySelector('a-assets')
+    const img = document.createElement('img')
+    img.setAttribute('id', `photo-${nrp}`)
+    img.setAttribute('src', src)
+    assets.appendChild(img)
+}
+
 function cleanDescriptors(descriptors) {
     descriptors.forEach((face, index, descriptor) => {
         if (face.descriptors.length === 0) {
@@ -134,9 +147,11 @@ function cleanDescriptors(descriptors) {
     return descriptors
 }
 
-function updateLabel(info) {
-    label.children[0].setAttribute('value', info.nama)
-    label.children[1].setAttribute('value', info.nrp)
+async function updateLabel(info) {
+    label.children[0].setAttribute('visible', 'true')
+    label.children[0].setAttribute('src', `#photo-${info.nrp}`)
+    label.children[1].setAttribute('value', info.nama)
+    label.children[2].setAttribute('value', info.nrp)
 }
 
 function updateBiodata(info) {
