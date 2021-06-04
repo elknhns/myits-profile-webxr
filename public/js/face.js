@@ -7,6 +7,12 @@ const academics = document.querySelector('#academics')
 
 var currentLabel = ""
 
+$.ajaxSetup({
+    headers: {
+        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+    }
+})
+
 Promise.all([
     faceapi.nets.faceRecognitionNet.loadFromUri('/models'),
     faceapi.nets.faceLandmark68Net.loadFromUri('/models'),
@@ -20,15 +26,22 @@ function startVideo() {
 }
 
 async function learnFaces() {
-    console.log('Face API Models loaded')
+    console.time('Face Matcher preparation')
+    console.debug('Face API Models loaded')
 
-    var labeledDescriptors = await loadLabeledImages()
-    console.log('All labeled images loaded')
+    // await updateDescriptors()
 
-    labeledDescriptors = cleanDescriptors(labeledDescriptors)
+    const descriptorsAddress = await getDescriptors()
+
+    labeledDescriptorsJson = await $.getJSON(descriptorsAddress)
+    const labeledDescriptors = labeledDescriptorsJson.map( x=>faceapi.LabeledFaceDescriptors.fromJSON(x) );
+
+    console.debug(labeledDescriptors)
+    await prepareImages(labeledDescriptors)
     
     const faceMatcher = prepareFaceMatcher(labeledDescriptors)
-    console.log('Face Matcher done')
+    console.debug('Face Matcher ready')
+    console.timeEnd('Face Matcher preparation')
 
     startVideo()
     recognizeFaces(faceMatcher)
@@ -48,11 +61,6 @@ async function recognizeFaces(faceMatcher) {
 
                 if (result.label != currentLabel) {
                     if (result.label != 'unknown') {
-                        $.ajaxSetup({
-                            headers: {
-                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                            }
-                        })
                         $.ajax({
                             type: 'POST',
                             url: `search/${result.label}`,
@@ -79,39 +87,47 @@ function prepareFaceMatcher(labeledDescriptors) {
     return new faceapi.FaceMatcher(labeledDescriptors, 0.6)
 }
 
+async function updateDescriptors() {
+    var labeledDescriptors = await loadLabeledImages()
+    console.debug('All labeled images loaded')
+
+    labeledDescriptors = cleanDescriptors(labeledDescriptors)
+
+    console.debug(labeledDescriptors)
+
+    var labeledDescriptorsJson = labeledDescriptors.map(x=>x.toJSON())
+
+    saveDescriptors(JSON.stringify(labeledDescriptorsJson))
+}
+
 async function loadLabeledImages() {
-    const labels = ['05111740000049', '05111740000076', '05111740000127', '05111740000154']
-    // const labels = await requestAllNRP()
-    console.log(labels)
+    var labels = await requestAllNRP()
+    labels.push('05111740000049', '05111740000076', '05111740000127', '05111740000154')
 
     return Promise.all(
         labels.map(async label => {
             const descriptions = []
             const link = await requestPhoto(label)
-            console.log(link)
+            console.debug(link)
             if (!link) {
-                console.log(label + "'s photo not found")
+                console.debug(label + "'s photo not found")
+                return null
             } else {
                 registerPhoto(label, link)
                 
                 const img = await faceapi.fetchImage(link)
-                console.log(img)
+                console.debug(img)
                 const detections = await faceapi.detectSingleFace(img).withFaceLandmarks().withFaceDescriptor()
                 descriptions.push(detections.descriptor)
 
-                console.log(label + "'s face loaded")
+                console.debug(label + "'s face loaded")
+                return new faceapi.LabeledFaceDescriptors(label, descriptions)
             }
-            return new faceapi.LabeledFaceDescriptors(label, descriptions)
         })
     )
 }
 
 function requestAllNRP() {
-    $.ajaxSetup({
-        headers: {
-            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-        }
-    })
     return $.ajax({
         type: 'POST',
         url: `nrp`,
@@ -119,11 +135,6 @@ function requestAllNRP() {
 }
 
 function requestPhoto(nrp) {
-    $.ajaxSetup({
-        headers: {
-            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-        }
-    })
     return $.ajax({
         type: 'POST',
         url: `search/${nrp}/photo`,
@@ -138,13 +149,41 @@ function registerPhoto(nrp, src) {
     assets.appendChild(img)
 }
 
+function getPhotoAddress() {
+    return $.ajax({
+        type: 'POST',
+        url: 'get-photo-address'
+    })
+}
+
 function cleanDescriptors(descriptors) {
-    descriptors.forEach((face, index, descriptor) => {
-        if (face.descriptors.length === 0) {
-            descriptor.splice(index, 1)
+    return descriptors.filter(descriptor => descriptor !== null)
+}
+
+function saveDescriptors(content) {
+    $.ajax({
+        type: "POST",
+        url: 'save-descriptors',
+        data: {
+            content: content
         }
     })
-    return descriptors
+}
+
+function getDescriptors() {
+    return $.ajax({
+        type: "POST",
+        url: 'get-descriptors'
+    })
+}
+
+async function prepareImages(labeledDescriptors) {
+    const link = await getPhotoAddress()
+    return Promise.all(
+        Object.values(labeledDescriptors).map(face => {
+            registerPhoto(face.label, `${link}/${face.label}.jpg`)
+        })
+    )
 }
 
 async function updateLabel(info) {

@@ -18,7 +18,11 @@ class HomeController extends Controller
     {
         $accessToken = $this->getAccessToken();
 
-        $response = Http::withToken($accessToken)->get('https://api.its.ac.id:8443/akademik-sandbox/1.5/mahasiswa/list-nrp');
+        $response = Http::withToken($accessToken)->get('https://api.its.ac.id:8443/akademik-sandbox/1.5/mahasiswa/list-nrp', [
+            // 'per-page' => 21600
+            'page' => 9,
+            'per-page' => 100
+        ]);
         $labels = [];
         foreach ($response->json() as $item) {
             array_push($labels, $item['nrp_baru']);
@@ -42,12 +46,24 @@ class HomeController extends Controller
         }
     }
 
+    public function getPhotoAddress() {
+        return asset('storage');
+    }
+
     public function recognizeFace($nrp)
     {
         $accessToken = $this->getAccessToken();
         
         $response = Http::withToken($accessToken)->get('https://api.its.ac.id:8443/akademik-sandbox/1.5/mahasiswa/' . $nrp);
         return $response->json()['0'];
+    }
+
+    public function saveDescriptors(Request $request) {
+        Storage::put('public/json/face-descriptors.json', $request->content);
+    }
+
+    public function getDescriptors() {
+        return asset('storage/json/face-descriptors.json');
     }
 
     private function getAccessToken() {
