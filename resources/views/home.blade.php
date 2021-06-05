@@ -11,6 +11,10 @@
             <a-image id="photo" mixin="label-photo" visible="false"></a-image>
             <a-text id="name" value="" mixin="label label-name raleway-bold" position="-0.2 -0.1 0"></a-text>
             <a-text id="nrp" value="" mixin="label raleway-regular" position="-0.2 0 0"></a-text>
+            <a-plane id="confidence" geometry="height: 0.5; width: 0.5" material="color: blue" position="-1.05 0 0" visible="false">
+                <a-text value="CONFIDENCE VALUE" mixin="label raleway-bold align-center" text="width: 0.6; wrapCount: 15" position="0 -0.15 0"></a-text>
+                <a-text id="confidence-value" value="" mixin="label raleway-bold align-center" width="4.5" position="0 -0.05 0"></a-text>
+            </a-plane>
         </a-entity>
 
         @include('menus.biodata')

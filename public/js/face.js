@@ -58,6 +58,7 @@ async function recognizeFaces(faceMatcher) {
             
             if (results.length !== 0) {
                 const result = results[0]
+                console.debug(result)
 
                 if (result.label != currentLabel) {
                     if (result.label != 'unknown') {
@@ -65,7 +66,7 @@ async function recognizeFaces(faceMatcher) {
                             type: 'POST',
                             url: `search/${result.label}`,
                             success: response => {
-                                updateLabel(response)
+                                updateLabel(response, result.distance)
                                 updateBiodata(response)
                                 updateAcademics(response)
                             },
@@ -186,11 +187,13 @@ async function prepareImages(labeledDescriptors) {
     )
 }
 
-async function updateLabel(info) {
+async function updateLabel(info, confidence) {
     label.children[0].setAttribute('visible', 'true')
     label.children[0].setAttribute('src', `#photo-${info.nrp}`)
     label.children[1].setAttribute('value', info.nama)
     label.children[2].setAttribute('value', info.nrp)
+    label.children[3].setAttribute('visible', 'true')
+    label.children[3].lastElementChild.setAttribute('value', `${Math.round(confidence*100)}%`)
 }
 
 function updateBiodata(info) {
