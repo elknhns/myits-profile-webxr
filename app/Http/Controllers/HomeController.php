@@ -39,7 +39,7 @@ class HomeController extends Controller
                             ->get('https://api.its.ac.id:8443/akademik-sandbox/1.5/mahasiswa/'.$nrp.'/foto');
             if ($response->getStatusCode() == 200) {
                 Storage::put('public/'.$nrp.'.jpg', $response);
-                return asset('storage/'.$nrp.'.jpg');
+                return secure_asset('storage/'.$nrp.'.jpg');
             } else {
                 return null;
             }
@@ -47,7 +47,7 @@ class HomeController extends Controller
     }
 
     public function getPhotoAddress() {
-        return asset('storage');
+        return secure_asset('storage');
     }
 
     public function recognizeFace($nrp)
@@ -63,7 +63,7 @@ class HomeController extends Controller
     }
 
     public function getDescriptors() {
-        return asset('storage/json/face-descriptors.json');
+        return secure_asset('storage/json/face-descriptors.json');
     }
 
     private function getAccessToken() {
