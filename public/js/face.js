@@ -56,31 +56,8 @@ async function recognizeFaces(faceMatcher) {
             })
             // console.log(results)
             
-            if (results.length !== 0) {
-                const result = results[0]
-                console.debug(result)
-
-                if (result.label != currentLabel) {
-                    if (result.label != 'unknown') {
-                        $.ajax({
-                            type: 'POST',
-                            url: `search/${result.label}`,
-                            success: response => {
-                                updateLabel(response, result.distance)
-                                updateBiodata(response)
-                                updateAcademics(response)
-                            },
-                            error: err => {
-                                console.log(err)
-                            }
-                        })
-                        currentLabel = result.label
-                    }   
-                }
-            } else {
-                currentLabel = ""
-            }
-        }, 1000)
+            currentLabel = processResults(results)
+        }, 200)
     })
 }
 
@@ -102,30 +79,113 @@ async function updateDescriptors() {
 }
 
 async function loadLabeledImages() {
-    var labels = await requestAllNRP()
-    labels.push('05111740000049', '05111740000076', '05111740000127', '05111740000154')
+    // var labels = await requestAllNRP()
+    var labels = []
+    const uniqueLabels = await getRegisteredLabels()
+    uniqueLabels.forEach((label) => {
+        labels.push(label)
+    })
 
     return Promise.all(
         labels.map(async label => {
             const descriptions = []
-            const link = await requestPhoto(label)
-            console.debug(link)
-            if (!link) {
-                console.debug(label + "'s photo not found")
-                return null
-            } else {
-                registerPhoto(label, link)
-                
-                const img = await faceapi.fetchImage(link)
-                console.debug(img)
-                const detections = await faceapi.detectSingleFace(img).withFaceLandmarks().withFaceDescriptor()
-                descriptions.push(detections.descriptor)
+            if (uniqueLabels.includes(label)) {
+                for (let i = 1; i < 4; i++) {
+                    const link = await requestMyPhotos(label, i)
+                    console.debug(label, i, link)
+                    if (i === 1) registerPhoto(label, link)
 
-                console.debug(label + "'s face loaded")
+                    const img = await faceapi.fetchImage(link)
+                    console.debug(img)
+                    const detections = await faceapi.detectSingleFace(img).withFaceLandmarks().withFaceDescriptor()
+                    descriptions.push(detections.descriptor)
+                    console.debug(`${label}'s ${i}th face loaded`)
+                }
                 return new faceapi.LabeledFaceDescriptors(label, descriptions)
+            } else {
+                const link = await requestPhoto(label)
+                console.debug(link)
+                if (!link) {
+                    console.debug(label + "'s photo not found")
+                    return null
+                } else {
+                    registerPhoto(label, link)
+                    
+                    const img = await faceapi.fetchImage(link)
+                    console.debug(img)
+                    const detections = await faceapi.detectSingleFace(img).withFaceLandmarks().withFaceDescriptor()
+                    descriptions.push(detections.descriptor)
+
+                    console.debug(label + "'s face loaded")
+                    return new faceapi.LabeledFaceDescriptors(label, descriptions)
+                }
             }
         })
     )
+}
+
+async function processResults(results) {
+    if (results.length === 0) {
+        updateLabel()
+        updateBiodata()
+        updateAcademics()
+        return ""
+    }
+    const result = results[0]
+    console.debug(result)
+
+    if (result.label !== 'unknown') {
+        const response = await requestInfo(result.label)
+        const course = JSON.parse(response)
+        updateLabel(result.distance, course)
+        updateBiodata(course)
+        updateAcademics(course)
+        return result.label
+    }
+}
+
+function cleanDescriptors(descriptors) {
+    return descriptors.filter(descriptor => descriptor !== null)
+}
+
+async function prepareImages(labeledDescriptors) {
+    const link = await getPhotoAddress()
+    const uniqueLabels = await getRegisteredLabels()
+    return Promise.all(
+        Object.values(labeledDescriptors).map(face => {
+            if(uniqueLabels.includes(face.label)) return registerPhoto(face.label, `${link}/photos/${face.label}/1.jpg`)
+            registerPhoto(face.label, `${link}/${face.label}.jpg`)
+        })
+    )
+}
+
+function registerPhoto(nrp, src) {
+    const assets = document.querySelector('a-assets')
+    const img = document.createElement('img')
+    img.setAttribute('id', `photo-${nrp}`)
+    img.setAttribute('src', src)
+    assets.appendChild(img)
+}
+
+function requestMyPhotos(nrp, filename) {
+    return $.ajax({
+        type: 'POST',
+        url: `search/${nrp}/${filename}/photo`,
+    })
+}
+
+function getRegisteredLabels() {
+    return $.ajax({
+        type: 'POST',
+        url: 'get-registered-labels'
+    })
+}
+
+function getPhotoAddress() {
+    return $.ajax({
+        type: 'POST',
+        url: 'get-photo-address'
+    })
 }
 
 function requestAllNRP() {
@@ -140,25 +200,6 @@ function requestPhoto(nrp) {
         type: 'POST',
         url: `search/${nrp}/photo`,
     })
-}
-
-function registerPhoto(nrp, src) {
-    const assets = document.querySelector('a-assets')
-    const img = document.createElement('img')
-    img.setAttribute('id', `photo-${nrp}`)
-    img.setAttribute('src', src)
-    assets.appendChild(img)
-}
-
-function getPhotoAddress() {
-    return $.ajax({
-        type: 'POST',
-        url: 'get-photo-address'
-    })
-}
-
-function cleanDescriptors(descriptors) {
-    return descriptors.filter(descriptor => descriptor !== null)
 }
 
 function saveDescriptors(content) {
@@ -178,27 +219,43 @@ function getDescriptors() {
     })
 }
 
-async function prepareImages(labeledDescriptors) {
-    const link = await getPhotoAddress()
-    return Promise.all(
-        Object.values(labeledDescriptors).map(face => {
-            registerPhoto(face.label, `${link}/${face.label}.jpg`)
-        })
-    )
+function requestInfo(nrp) {
+    return $.ajax({
+        type: 'POST',
+        url: `search/${nrp}`,
+    })
 }
 
-async function updateLabel(info, confidence) {
-    label.children[0].setAttribute('visible', 'true')
-    label.children[0].setAttribute('src', `#photo-${info.nrp}`)
-    label.children[1].setAttribute('value', info.nama)
-    label.children[2].setAttribute('value', info.nrp)
-    label.children[3].setAttribute('visible', 'true')
+async function updateLabel(confidence, info = null) {
+    if (!confidence) {
+        label.children[0].setAttribute('visible', 'false')
+        label.children[1].setAttribute('value', '')
+        label.children[2].setAttribute('value', '')
+        label.children[3].setAttribute('visible', 'false')
+        return
+    }
+
     label.children[3].lastElementChild.setAttribute('value', `${Math.round(confidence*100)}%`)
+
+    if (info) {
+        label.children[0].setAttribute('visible', 'true')
+        label.children[0].setAttribute('src', `#photo-${info.nrp}`)
+        label.children[1].setAttribute('value', info.nama)
+        label.children[2].setAttribute('value', info.nrp)
+        label.children[3].setAttribute('visible', 'true')
+    }
 }
 
-function updateBiodata(info) {
+function updateBiodata(info = null) {
     const details = biodata.lastElementChild
     const detailText = details.lastElementChild
+
+    if (!info) {
+        for (child of detailText.children) {
+            child.lastElementChild.setAttribute('value', 'Wajah tidak dikenal')
+        }
+        return        
+    }
     
     detailText.children[0].lastElementChild.setAttribute('value', capitalize(info.nama_lengkap))
     detailText.children[1].lastElementChild.setAttribute('value', info.email)
@@ -210,9 +267,16 @@ function updateBiodata(info) {
     detailText.children[7].lastElementChild.setAttribute('value', `${info.alamat_surabaya}, ${info.kode_pos}`)
 }
 
-function updateAcademics(info) {
+function updateAcademics(info = null) {
     const details = academics.lastElementChild
     const detailText = details.lastElementChild
+
+    if (!info) {
+        for (child of detailText.children) {
+            child.lastElementChild.setAttribute('value', 'Wajah tidak dikenal')
+        }
+        return
+    }
     
     detailText.children[0].lastElementChild.setAttribute('value', info.nrp)
     detailText.children[1].lastElementChild.setAttribute('value', capitalize(info.prodi))
