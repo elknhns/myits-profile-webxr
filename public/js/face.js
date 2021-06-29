@@ -29,7 +29,7 @@ async function learnFaces() {
     console.time('Face Matcher preparation')
     console.debug('Face API Models loaded')
 
-    await updateDescriptors()
+    // await updateDescriptors()
 
     const descriptorsAddress = await getDescriptors()
 
