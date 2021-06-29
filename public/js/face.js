@@ -20,7 +20,7 @@ Promise.all([
 ]).then(learnFaces)
 
 function startVideo() {
-    navigator.mediaDevices.getUserMedia({ video: {} })
+    navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } })
         .then(stream => video.srcObject = stream)
         .catch(err => console.error(err))
 }
