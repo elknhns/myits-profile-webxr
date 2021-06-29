@@ -12,7 +12,7 @@ class HomeController extends Controller
     public function index()
     {   
         // dd($this->recognizeFace('05111740000127'));
-        $this->setAccessToken();
+        // $this->setAccessToken();
         return view('home');
     }
 
@@ -20,7 +20,7 @@ class HomeController extends Controller
     {
         // $accessToken = $this->getAccessToken();
         // $response = Http::withToken($accessToken)->get('https://api.its.ac.id:8443/akademik-sandbox/1.5/mahasiswa/' . $nrp);
-        return json_encode(json_decode(Storage::disk('local')->get('public/json/biodata/'.$nrp.'.json'))[0]);
+        return json_encode(json_decode(Storage::disk('public')->get('json/biodata/'.$nrp.'.json'))[0]);
     }
 
     public function requestAllNRP()
@@ -56,29 +56,29 @@ class HomeController extends Controller
     }
 
     public function requestMyPhoto($nrp, $filename) {
-        return asset('storage/photos/'.$nrp.'/'.$filename.'.jpg');
+        return asset('photos/'.$nrp.'/'.$filename.'.jpg');
     }
 
     public function getRegisteredLabels() {
-        $photoAddresses = Storage::allDirectories('public/photos');
+        $photoAddresses = Storage::disk('public')->allDirectories('photos');
         $labels = array();
         foreach ($photoAddresses as $address) {
-            $label = substr($address, 14);
+            $label = substr($address, 7);
             array_push($labels, $label);
         }
         return $labels;
     }
 
     public function getPhotoAddress() {
-        return asset('storage');
+        return asset('photos');
     }
 
     public function saveDescriptors(Request $request) {
-        Storage::put('public/json/face-descriptors.json', $request->content);
+        Storage::disk('public')->put('json/face-descriptors.json', $request->content);
     }
 
     public function getDescriptors() {
-        return asset('storage/json/face-descriptors.json');
+        return asset('json/face-descriptors.json');
     }
 
     private function setAccessToken() {

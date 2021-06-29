@@ -29,7 +29,7 @@ async function learnFaces() {
     console.time('Face Matcher preparation')
     console.debug('Face API Models loaded')
 
-    // await updateDescriptors()
+    await updateDescriptors()
 
     const descriptorsAddress = await getDescriptors()
 
@@ -98,6 +98,7 @@ async function loadLabeledImages() {
                     const img = await faceapi.fetchImage(link)
                     console.debug(img)
                     const detections = await faceapi.detectSingleFace(img).withFaceLandmarks().withFaceDescriptor()
+                    console.debug(label, detections)
                     descriptions.push(detections.descriptor)
                     console.debug(`${label}'s ${i}th face loaded`)
                 }
@@ -153,7 +154,7 @@ async function prepareImages(labeledDescriptors) {
     const uniqueLabels = await getRegisteredLabels()
     return Promise.all(
         Object.values(labeledDescriptors).map(face => {
-            if(uniqueLabels.includes(face.label)) return registerPhoto(face.label, `${link}/photos/${face.label}/1.jpg`)
+            if(uniqueLabels.includes(face.label)) return registerPhoto(face.label, `${link}/${face.label}/1.jpg`)
             registerPhoto(face.label, `${link}/${face.label}.jpg`)
         })
     )
