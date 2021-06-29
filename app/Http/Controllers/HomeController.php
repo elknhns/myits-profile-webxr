@@ -48,15 +48,15 @@ class HomeController extends Controller
                             ->get('https://api.its.ac.id:8443/akademik-sandbox/1.5/mahasiswa/'.$nrp.'/foto');
             if ($response->getStatusCode() == 200) {
                 Storage::put('public/'.$nrp.'.jpg', $response);
-                return asset('storage/'.$nrp.'.jpg');
+                return secure_asset('storage/'.$nrp.'.jpg');
             }
             return null;
         }
-        return asset('storage/'.$nrp.'.jpg');
+        return secure_asset('storage/'.$nrp.'.jpg');
     }
 
     public function requestMyPhoto($nrp, $filename) {
-        return asset('photos/'.$nrp.'/'.$filename.'.jpg');
+        return secure_asset('photos/'.$nrp.'/'.$filename.'.jpg');
     }
 
     public function getRegisteredLabels() {
@@ -70,7 +70,7 @@ class HomeController extends Controller
     }
 
     public function getPhotoAddress() {
-        return asset('photos');
+        return secure_asset('photos');
     }
 
     public function saveDescriptors(Request $request) {
@@ -78,7 +78,7 @@ class HomeController extends Controller
     }
 
     public function getDescriptors() {
-        return asset('json/face-descriptors.json');
+        return secure_asset('json/face-descriptors.json');
     }
 
     private function setAccessToken() {
