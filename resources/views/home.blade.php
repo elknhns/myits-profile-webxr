@@ -3,7 +3,7 @@
 @section('content')
     @include('assets.index')
 
-    <a-camera zappar-camera></a-camera>
+    <a-camera zappar-camera="user-facing:true"></a-camera>
     <a-entity id="menu" zappar-face>
         <a-entity zappar-head-mask="face:#menu"></a-entity>
 
@@ -19,7 +19,7 @@
 
         @include('menus.biodata')
         @include('menus.academics')
-        @include('menus.occupation')
+        @include('menus.career')
         @include('menus.family')
     </a-entity>
 @endsection

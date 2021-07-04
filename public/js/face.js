@@ -4,6 +4,8 @@ const label = document.querySelector('#labelSection')
 
 const biodata = document.querySelector('#biodata')
 const academics = document.querySelector('#academics')
+const career = document.querySelector('#career')
+const family = document.querySelector('#family')
 
 var currentLabel = ""
 
@@ -29,7 +31,7 @@ async function learnFaces() {
     console.time('Face Matcher preparation')
     console.debug('Face API Models loaded')
 
-    // await updateDescriptors()
+    await updateDescriptors()
 
     const descriptorsAddress = await getDescriptors()
 

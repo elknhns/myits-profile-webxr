@@ -1,20 +1,41 @@
 var menu = document.querySelector("#menu")
 var buttons = document.querySelectorAll(".menu-button")
 
+const UIButtons = document.querySelector('.buttons')
+
+const biodataButton = document.querySelector('#button-biodata')
+const academicsButton = document.querySelector('#button-academics')
+const careerButton = document.querySelector('#button-career')
+const familyButton = document.querySelector('#button-family')
+
 setButtonVisibility()
 
-document.addEventListener('keydown', function (event) {
-    // Use 'Q' to toggle biodata details
-    if (event.key === 'q') {
-        toggleDetailVisibility(biodata)
-        toggleDetailVisibility(academics, true)
-    }
+biodataButton.addEventListener('click', () => {
+    toggleDetailVisibility(biodata)
+    toggleDetailVisibility(academics, true)
+    toggleDetailVisibility(career, true)
+    toggleDetailVisibility(family, true)
+})
 
-    // Use 'W' to toggle academics details
-    if (event.key === 'w') {
-        toggleDetailVisibility(academics)
-        toggleDetailVisibility(biodata, true)
-    }
+academicsButton.addEventListener('click', () => {
+    toggleDetailVisibility(academics)
+    toggleDetailVisibility(biodata, true)
+    toggleDetailVisibility(career, true)
+    toggleDetailVisibility(family, true)
+})
+
+careerButton.addEventListener('click', () => {
+    toggleDetailVisibility(career)
+    toggleDetailVisibility(biodata, true)
+    toggleDetailVisibility(academics, true)
+    toggleDetailVisibility(family, true)
+})
+
+familyButton.addEventListener('click', () => {
+    toggleDetailVisibility(family)
+    toggleDetailVisibility(biodata, true)
+    toggleDetailVisibility(academics, true)
+    toggleDetailVisibility(career, true)
 })
 
 function setButtonVisibility() {
@@ -24,8 +45,11 @@ function setButtonVisibility() {
             button.setAttribute('mixin', 'menu-section pop-in')
         })
         label.setAttribute('visible', 'true')
+        UIButtons.style.visibility = 'visible'
         toggleDetailVisibility(biodata, true)
         toggleDetailVisibility(academics, true)
+        toggleDetailVisibility(career, true)
+        toggleDetailVisibility(family, true)
     })
     menu.addEventListener('zappar-notvisible', function () {
         buttons.forEach((button) => {
@@ -33,6 +57,7 @@ function setButtonVisibility() {
             button.setAttribute('mixin', 'menu-section')
         })
         label.setAttribute('visible', 'false')
+        UIButtons.style.visibility = 'hidden'
         currentLabel = ""
     })
 }
@@ -40,7 +65,7 @@ function setButtonVisibility() {
 function toggleDetailVisibility(menu, toggleOff = false) {
     const details = menu.lastElementChild
     const titleBox = details.firstElementChild
-    const detailText = details.lastElementChild
+    console.debug(menu, details)
     
     if (details.getAttribute('visible') || toggleOff) {
         details.setAttribute('visible', 'false')

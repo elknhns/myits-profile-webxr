@@ -78,7 +78,7 @@ class HomeController extends Controller
     }
 
     public function getDescriptors() {
-        return secure_asset('json/face-descriptors.json');
+        return asset('json/face-descriptors.json');
     }
 
     private function setAccessToken() {
