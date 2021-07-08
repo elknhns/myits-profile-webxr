@@ -82,14 +82,14 @@
         id="label-name"
         text="
             baseline: top;
-            width: 1.2;
+            width: 1;
             wrapCount: 21
         "
     ></a-mixin>
 
     <a-mixin
         id="label-photo"
-        position="-0.5 0 0"
+        position="0.25 0 0"
         scale="0.45 0.5 1"
     ></a-mixin>
 </a-assets>

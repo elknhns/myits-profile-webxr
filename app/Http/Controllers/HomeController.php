@@ -69,16 +69,20 @@ class HomeController extends Controller
         return $labels;
     }
 
-    public function getPhotoAddress() {
-        return secure_asset('photos');
+    public function saveResults(Request $request) {
+        Storage::disk('public')->put('json/results.json', $request->content);
     }
 
     public function saveDescriptors(Request $request) {
         Storage::disk('public')->put('json/face-descriptors.json', $request->content);
     }
 
+    public function getPhotoAddress() {
+        return secure_asset('photos');
+    }
+
     public function getDescriptors() {
-        return asset('json/face-descriptors.json');
+        return secure_asset('json/face-descriptors.json');
     }
 
     private function setAccessToken() {

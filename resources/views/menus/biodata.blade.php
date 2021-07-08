@@ -1,8 +1,8 @@
-<a-entity id="biodata" class="menu-button" mixin="menu-section" position="-1.25 0.4 0">
-    <a-cylinder mixin="button">
+<a-entity id="biodata" class="menu-button" mixin="menu-section" position="1.2 0.4 0" scale="0.6 0.6 1">
+    {{-- <a-cylinder mixin="button">
         <a-image src="#user" mixin="icon"></a-image>
-    </a-cylinder>
-    <a-plane mixin="detail-card" position="-0.3 -0.2 0.2" height="1.9" visible="false">
+    </a-cylinder> --}}
+    <a-plane mixin="detail-card" position="0 -0.2 0.2" height="1.9" visible="false">
         <a-box id="detailTitle" mixin="detail-title" position="0 0.8 0">
             <a-text mixin="raleway-bold detail-title-text" value="BIODATA" position="0 -0.04 0.06"></a-text>
         </a-box>

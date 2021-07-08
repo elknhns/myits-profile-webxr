@@ -16,12 +16,20 @@
         }
 
         .buttons {
-            position: absolute;
             bottom: 20px;
             visibility: hidden;
         }
 
-        .btn {
+        .alert {
+            top: 20px;
+            visibility: hidden;
+        }
+
+        .buttons, .alert {
+            position: absolute;
+        }
+
+        .btn, .alert {
             font-family: 'Raleway', sans-serif;
         }
 
@@ -37,26 +45,31 @@
         @yield('content')
     </a-scene>
 
-    <div class="buttons container m-2">
-        <div class="row d-flex justify-content-center">
-            <button id="button-academics" type="button" class="btn btn-primary col-4 m-1 p-2 fw-bold">
-                <img src="{{ secure_asset('img/graduation-hat.png') }}"> &nbsp; AKADEMIK
-            </button>
-            <button id="button-career" type="button" class="btn btn-primary col-4 m-1 p-2 fw-bold">
-                <img src="{{ secure_asset('img/suitcase.png') }}"> &nbsp; KARIR
-            </button>
-            <button id="button-biodata" type="button" class="btn btn-primary col-4 m-1 p-2 fw-bold">
-                <img src="{{ secure_asset('img/user.png') }}"> &nbsp; BIODATA
-            </button>
-            <button id="button-family" type="button" class="btn btn-primary col-4 m-1 p-2 fw-bold">
-                <img src="{{ secure_asset('img/family.png') }}"> &nbsp; KELUARGA
-            </button>
+    <div class="container">
+        <div class="d-flex justify-content-center">
+            <div class="alert alert-dark text-center fw-bold"></div>
+        </div>
+        <div class="buttons m-2">
+            <div class="row d-flex justify-content-center">
+                <button id="button-academics" type="button" class="btn btn-primary col-4 m-1 p-2 fw-bold">
+                    <img src="{{ secure_asset('img/graduation-hat.png') }}"> &nbsp; AKADEMIK
+                </button>
+                <button id="button-career" type="button" class="btn btn-primary col-4 m-1 p-2 fw-bold">
+                    <img src="{{ secure_asset('img/suitcase.png') }}"> &nbsp; KARIR
+                </button>
+                <button id="button-biodata" type="button" class="btn btn-primary col-4 m-1 p-2 fw-bold">
+                    <img src="{{ secure_asset('img/user.png') }}"> &nbsp; BIODATA
+                </button>
+                <button id="button-family" type="button" class="btn btn-primary col-4 m-1 p-2 fw-bold">
+                    <img src="{{ secure_asset('img/family.png') }}"> &nbsp; KELUARGA
+                </button>
+            </div>
         </div>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.bundle.min.js" integrity="sha384-JEW9xMcG8R+pH31jmWH6WWP0WintQrMb4s7ZOdauHnUtxwoG2vI5DkLtS3qm9Ekf" crossorigin="anonymous"></script>
-    <script src="{{ secure_asset('js/vr.js') }}" defer></script>
+    <script src="{{ secure_asset('js/ar.js') }}" defer></script>
     <script src="{{ secure_asset('js/face-api.min.js') }}" defer></script>
     <script src="{{ secure_asset('js/face.js') }}" defer></script>
 </body>

@@ -7,13 +7,18 @@ const academics = document.querySelector('#academics')
 const career = document.querySelector('#career')
 const family = document.querySelector('#family')
 
+const alertBar = document.querySelector('.alert')
+
 var currentLabel = ""
+var tick = 0
 
 $.ajaxSetup({
     headers: {
         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
     }
 })
+
+updateAlert('Memuat model...')
 
 Promise.all([
     faceapi.nets.faceRecognitionNet.loadFromUri('/models'),
@@ -22,7 +27,7 @@ Promise.all([
 ]).then(learnFaces)
 
 function startVideo() {
-    navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } })
+    navigator.mediaDevices.getUserMedia({ video: {} })
         .then(stream => video.srcObject = stream)
         .catch(err => console.error(err))
 }
@@ -30,37 +35,63 @@ function startVideo() {
 async function learnFaces() {
     console.time('Face Matcher preparation')
     console.debug('Face API Models loaded')
+    updateAlert('Memuat file deskriptor...')
 
-    await updateDescriptors()
+    // await updateDescriptors()
 
     const descriptorsAddress = await getDescriptors()
 
     labeledDescriptorsJson = await $.getJSON(descriptorsAddress)
     const labeledDescriptors = labeledDescriptorsJson.map( x=>faceapi.LabeledFaceDescriptors.fromJSON(x) );
 
-    console.debug(labeledDescriptors)
+    // console.debug(labeledDescriptors)
     await prepareImages(labeledDescriptors)
     
+    updateAlert('Menyiapkan Face Matcher...')
     const faceMatcher = prepareFaceMatcher(labeledDescriptors)
+
     console.debug('Face Matcher ready')
-    console.timeEnd('Face Matcher preparation')
 
     startVideo()
     recognizeFaces(faceMatcher)
 }
 
 async function recognizeFaces(faceMatcher) {
-    video.addEventListener('play', () => {
-        setInterval(async () => {
-            const detections = await faceapi.detectAllFaces(video).withFaceLandmarks().withFaceDescriptors()    
-            const results = detections.map((d) => {
-                return faceMatcher.findBestMatch(d.descriptor)
-            })
-            // console.log(results)
-            
-            currentLabel = processResults(results)
-        }, 200)
-    })
+    console.timeEnd('Face Matcher preparation')
+    updateAlert('Sistem pengenalan wajah siap digunakan.')
+    alertBar.className = 'alert alert-success text-center fw-bold'
+    
+    var recordedResults = []
+    // video.addEventListener('play', () => {
+        
+    // })
+    setInterval(async () => {
+        console.debug('Mulai interval')
+        // updateAlert('Mulai interval')
+        const detections = await faceapi.detectAllFaces(video).withFaceLandmarks().withFaceDescriptors()
+        console.debug('Sistem mendeteksi wajah')
+        // updateAlert('Sistem mendeteksi wajah')
+        const results = detections.map((d) => {
+            return faceMatcher.findBestMatch(d.descriptor)
+        })
+        console.debug('Sistem mencocokkan wajah')
+        // updateAlert('Sistem mencocokkan wajah')
+        currentLabel = processResults(results)
+
+        if (tick < 20) {
+            recordedResults.push(results)
+            tick++
+        }
+        if (tick === 20) {
+            saveResults(JSON.stringify(recordedResults))
+            console.debug('Result file generated')
+            updateAlert('Hasil pengujian berhasil direkam. Terima kasih atas waktunya.')
+            setTimeout(() => {
+                alertBar.style.visibility = 'hidden'
+            }, 3000)
+            tick++
+        }
+    }, 1000)
 }
 
 function prepareFaceMatcher(labeledDescriptors) {
@@ -128,6 +159,7 @@ async function loadLabeledImages() {
 }
 
 async function processResults(results) {
+    alertBar.style.visibility = 'hidden'
     if (results.length === 0) {
         updateLabel()
         updateBiodata()
@@ -154,10 +186,15 @@ function cleanDescriptors(descriptors) {
 async function prepareImages(labeledDescriptors) {
     const link = await getPhotoAddress()
     const uniqueLabels = await getRegisteredLabels()
+    var imagesLoaded = 0
+    updateAlert(`Memuat foto... (${imagesLoaded}/90)`)
     return Promise.all(
         Object.values(labeledDescriptors).map(face => {
-            if(uniqueLabels.includes(face.label)) return registerPhoto(face.label, `${link}/${face.label}/1.jpg`)
-            registerPhoto(face.label, `${link}/${face.label}.jpg`)
+            if (uniqueLabels.includes(face.label))
+                registerPhoto(face.label, `${link}/${face.label}/1.jpg`)
+            else registerPhoto(face.label, `${link}/${face.label}.jpg`)
+            imagesLoaded++
+            updateAlert(`Memuat foto... (${imagesLoaded}/90)`)
         })
     )
 }
@@ -174,13 +211,6 @@ function requestMyPhotos(nrp, filename) {
     return $.ajax({
         type: 'POST',
         url: `search/${nrp}/${filename}/photo`,
-    })
-}
-
-function getRegisteredLabels() {
-    return $.ajax({
-        type: 'POST',
-        url: 'get-registered-labels'
     })
 }
 
@@ -205,10 +235,27 @@ function requestPhoto(nrp) {
     })
 }
 
+function requestInfo(nrp) {
+    return $.ajax({
+        type: 'POST',
+        url: `search/${nrp}`,
+    })
+}
+
 function saveDescriptors(content) {
     $.ajax({
         type: "POST",
         url: 'save-descriptors',
+        data: {
+            content: content
+        }
+    })
+}
+
+function saveResults(content) {
+    $.ajax({
+        type: "POST",
+        url: 'save-results',
         data: {
             content: content
         }
@@ -222,10 +269,10 @@ function getDescriptors() {
     })
 }
 
-function requestInfo(nrp) {
+function getRegisteredLabels() {
     return $.ajax({
         type: 'POST',
-        url: `search/${nrp}`,
+        url: 'get-registered-labels'
     })
 }
 
@@ -320,4 +367,9 @@ function filterBirthday(birthday) {
 function fliterGPA(gpa) {
     // Round GPA to 2 digit decimal
     return parseFloat(gpa).toFixed(2)
+}
+
+function updateAlert(message) {
+    alertBar.style.visibility = 'visible'
+    alertBar.textContent = message
 }
