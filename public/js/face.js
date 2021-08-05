@@ -10,7 +10,6 @@ const family = document.querySelector('#family')
 const alertBar = document.querySelector('.alert')
 
 var currentLabel = ""
-var tick = 0
 
 $.ajaxSetup({
     headers: {
@@ -33,64 +32,32 @@ function startVideo() {
 }
 
 async function learnFaces() {
-    console.time('Face Matcher preparation')
-    console.debug('Face API Models loaded')
     updateAlert('Memuat file deskriptor...')
-
-    // await updateDescriptors()
 
     const descriptorsAddress = await getDescriptors()
 
     labeledDescriptorsJson = await $.getJSON(descriptorsAddress)
     const labeledDescriptors = labeledDescriptorsJson.map( x=>faceapi.LabeledFaceDescriptors.fromJSON(x) );
 
-    // console.debug(labeledDescriptors)
     await prepareImages(labeledDescriptors)
     
     updateAlert('Menyiapkan Face Matcher...')
     const faceMatcher = prepareFaceMatcher(labeledDescriptors)
-
-    console.debug('Face Matcher ready')
 
     startVideo()
     recognizeFaces(faceMatcher)
 }
 
 async function recognizeFaces(faceMatcher) {
-    console.timeEnd('Face Matcher preparation')
-    updateAlert('Sistem pengenalan wajah siap digunakan.')
+    updateAlert('Sistem pengenalan wajah sedang berjalan.')
     alertBar.className = 'alert alert-success text-center fw-bold'
-    
-    var recordedResults = []
-    // video.addEventListener('play', () => {
-        
-    // })
+
     setInterval(async () => {
-        console.debug('Mulai interval')
-        // updateAlert('Mulai interval')
         const detections = await faceapi.detectAllFaces(video).withFaceLandmarks().withFaceDescriptors()
-        console.debug('Sistem mendeteksi wajah')
-        // updateAlert('Sistem mendeteksi wajah')
         const results = detections.map((d) => {
             return faceMatcher.findBestMatch(d.descriptor)
         })
-        console.debug('Sistem mencocokkan wajah')
-        // updateAlert('Sistem mencocokkan wajah')
         currentLabel = processResults(results)
-
-        if (tick < 20) {
-            recordedResults.push(results)
-            tick++
-        }
-        if (tick === 20) {
-            saveResults(JSON.stringify(recordedResults))
-            console.debug('Result file generated')
-            updateAlert('Hasil pengujian berhasil direkam. Terima kasih atas waktunya.')
-            setTimeout(() => {
-                alertBar.style.visibility = 'hidden'
-            }, 3000)
-            tick++
-        }
     }, 1000)
 }
 
@@ -112,7 +79,6 @@ async function updateDescriptors() {
 }
 
 async function loadLabeledImages() {
-    // var labels = await requestAllNRP()
     var labels = []
     const uniqueLabels = await getRegisteredLabels()
     uniqueLabels.forEach((label) => {
@@ -170,11 +136,10 @@ async function processResults(results) {
     console.debug(result)
 
     if (result.label !== 'unknown') {
-        const response = await requestInfo(result.label)
-        const course = JSON.parse(response)
-        updateLabel(result.distance, course)
-        updateBiodata(course)
-        updateAcademics(course)
+        const info = await requestInfo(result.label)
+        updateLabel(result.distance, info)
+        updateBiodata(info)
+        updateAcademics(info)
         return result.label
     }
 }
@@ -187,14 +152,14 @@ async function prepareImages(labeledDescriptors) {
     const link = await getPhotoAddress()
     const uniqueLabels = await getRegisteredLabels()
     var imagesLoaded = 0
-    updateAlert(`Memuat foto... (${imagesLoaded}/90)`)
+    updateAlert(`Memuat foto... (${imagesLoaded}/${Object.values(labeledDescriptors).length})`)
     return Promise.all(
         Object.values(labeledDescriptors).map(face => {
             if (uniqueLabels.includes(face.label))
                 registerPhoto(face.label, `${link}/${face.label}/1.jpg`)
             else registerPhoto(face.label, `${link}/${face.label}.jpg`)
             imagesLoaded++
-            updateAlert(`Memuat foto... (${imagesLoaded}/90)`)
+            updateAlert(`Memuat foto... (${imagesLoaded}/${Object.values(labeledDescriptors).length})`)
         })
     )
 }
@@ -372,4 +337,5 @@ function fliterGPA(gpa) {
 function updateAlert(message) {
     alertBar.style.visibility = 'visible'
     alertBar.textContent = message
+    console.debug(message)
 }
