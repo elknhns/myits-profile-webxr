@@ -1,0 +1,25 @@
+video {
+    visibility: hidden;
+}
+
+.buttons {
+    bottom: 20px;
+    visibility: hidden;
+}
+
+.alert {
+    top: 20px;
+    visibility: hidden;
+}
+
+.buttons, .alert {
+    position: absolute;
+}
+
+.btn, .alert {
+    font-family: 'Raleway', sans-serif;
+}
+
+button > img {
+    height: 20px;
+}

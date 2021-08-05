@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\HomeController;
+use App\Http\Controllers\{HomeController, StudentController};
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -23,4 +23,4 @@ Route::post('get-photo-address', [HomeController::class, 'getPhotoAddress']);
 Route::post('get-registered-labels', [HomeController::class, 'getRegisteredLabels']);
 Route::post('search/{nrp}/{filename}/photo', [HomeController::class, 'requestMyPhoto']);
 Route::post('search/{nrp}/photo', [HomeController::class, 'requestPhoto']);
-Route::post('search/{nrp}', [HomeController::class, 'recognizeFace']);
+Route::post('search/{nrp}', [StudentController::class, 'recognizeFace']);

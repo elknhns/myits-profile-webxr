@@ -42,7 +42,6 @@ function setButtonVisibility() {
     menu.addEventListener('zappar-visible', function () {
         buttons.forEach((button) => {
             button.setAttribute('visible', 'true')
-            // button.setAttribute('mixin', 'menu-section pop-in')
         })
         label.setAttribute('visible', 'true')
         UIButtons.style.visibility = 'visible'
@@ -54,7 +53,6 @@ function setButtonVisibility() {
     menu.addEventListener('zappar-notvisible', function () {
         buttons.forEach((button) => {
             button.setAttribute('visible', 'false')
-            // button.setAttribute('mixin', 'menu-section')
         })
         label.setAttribute('visible', 'false')
         UIButtons.style.visibility = 'hidden'
@@ -69,13 +67,11 @@ function toggleDetailVisibility(menu, toggleOff = false) {
     if (details.getAttribute('visible') || toggleOff) {
         details.setAttribute('visible', 'false')
         details.setAttribute('mixin', 'detail-card')
-        // details.previousElementSibling.setAttribute('mixin', 'button pop-in')
         titleBox.setAttribute('mixin', 'detail-title')
         titleBox.firstElementChild.setAttribute('mixin', 'raleway-bold detail-title-text')
     } else {
         details.setAttribute('visible', 'true')
         details.setAttribute('mixin', 'detail-card opened')
-        // details.previousElementSibling.setAttribute('mixin', 'button shrink')
         titleBox.setAttribute('mixin', 'detail-title unfolded')
         titleBox.firstElementChild.setAttribute('mixin', 'raleway-bold detail-title-text fade-in')
     }

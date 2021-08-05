@@ -3,7 +3,7 @@
 @section('content')
     @include('assets.index')
 
-    <a-camera zappar-camera></a-camera>
+    <a-camera zappar-camera="userFacing: true"></a-camera>
     <a-entity id="menu" zappar-face>
         <a-entity zappar-head-mask="face:#menu"></a-entity>
 
